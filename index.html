@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="今日のニュース">
+<title>今日のニュース</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--hd:#161b22;--bd:#21262d;--red:#ff6b6b;--grn:#3fb950;--blu:#58a6ff;--yel:#d29922;--tx:#e6edf3;--mt:#8b949e;--bdr:#30363d;--cd:#1c2128;--cdh:#262c36;--r:12px;--sh:0 4px 20px rgba(0,0,0,.5)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+header{background:var(--hd);border-bottom:1px solid var(--bdr);padding:14px 16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.6)}
+.ht{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:22px}
+.logo h1{font-size:17px;font-weight:700;background:linear-gradient(90deg,var(--red),var(--grn));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.dt{font-size:10px;color:var(--mt);background:var(--bdr);padding:3px 8px;border-radius:20px;white-space:nowrap;margin-left:auto}
+.upd{font-size:10px;color:var(--mt)}
+.tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:72px;padding:10px 6px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--mt);border-bottom:2px solid transparent;transition:all .2s;user-select:none;white-space:nowrap}
+.tab.rs{color:var(--red);border-color:var(--red)}
+.tab.rg{color:var(--grn);border-color:var(--grn)}
+.tab.rb{color:var(--blu);border-color:var(--blu)}
+.tab.ry{color:var(--yel);border-color:var(--yel)}
+main{padding:14px;max-width:760px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+.sh{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 14px;background:var(--hd);border-radius:var(--r);border:1px solid var(--bdr)}
+.dot{width:8px;height:8px;border-radius:50%}
+.dr{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dg{background:var(--grn);box-shadow:0 0 6px var(--grn)}
+.db{background:var(--blu);box-shadow:0 0 6px var(--blu)}
+.dy{background:var(--yel);box-shadow:0 0 6px var(--yel)}
+.sl{font-size:12px;font-weight:600;color:var(--mt)}
+.sc{margin-left:auto;font-size:11px;color:var(--mt)}
+.nl{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--cd);border:1px solid var(--bdr);border-radius:var(--r);padding:13px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;opacity:0;transition:opacity .2s}
+#social .card::before{background:var(--red)}
+#economy .card::before{background:var(--grn)}
+#sports .card::before{background:var(--blu)}
+#local .card::before{background:var(--yel)}
+.card:hover{background:var(--cdh);transform:translateY(-1px);box-shadow:var(--sh)}
+.card:hover::before,.card.open::before{opacity:1}
+.card.open{background:var(--cdh)}
+#social .card.open{border-color:var(--red)}
+#economy .card.open{border-color:var(--grn)}
+#sports .card.open{border-color:var(--blu)}
+#local .card.open{border-color:var(--yel)}
+.ch{display:flex;align-items:flex-start;gap:9px}
+.cn{font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;white-space:nowrap;margin-top:2px;flex-shrink:0}
+#social .cn{color:var(--red);background:rgba(255,107,107,.12)}
+#economy .cn{color:var(--grn);background:rgba(63,185,80,.12)}
+#sports .cn{color:var(--blu);background:rgba(88,166,255,.12)}
+#local .cn{color:var(--yel);background:rgba(210,153,34,.12)}
+.ct{font-size:14px;font-weight:600;line-height:1.5;flex:1}
+.ci{font-size:11px;color:var(--mt);margin-left:auto;transition:transform .2s;flex-shrink:0;margin-top:2px}
+.card.open .ci{transform:rotate(180deg)}
+.cm{display:flex;margin-top:6px;margin-left:33px}
+.cs{font-size:11px;color:var(--mt)}
+.sa{display:none;margin-top:11px;padding-top:11px;border-top:1px solid var(--bdr)}
+.card.open .sa{display:block}
+.sp{list-style:none;display:flex;flex-direction:column;gap:6px}
+.sp li{display:flex;gap:7px;align-items:flex-start;font-size:13px;line-height:1.7}
+.sp li::before{content:"\25B8";flex-shrink:0;margin-top:2px}
+#social .sp li::before{color:var(--red)}
+#economy .sp li::before{color:var(--grn)}
+#sports .sp li::before{color:var(--blu)}
+#local .sp li::before{color:var(--yel)}
+.rm{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:12px;text-decoration:none;padding:5px 12px;border-radius:20px;transition:all .2s}
+#social .rm{color:var(--red);border:1px solid rgba(255,107,107,.3)}
+#economy .rm{color:var(--grn);border:1px solid rgba(63,185,80,.3)}
+#sports .rm{color:var(--blu);border:1px solid rgba(88,166,255,.3)}
+#local .rm{color:var(--yel);border:1px solid rgba(210,153,34,.3)}
+#social .rm:hover{background:rgba(255,107,107,.1)}
+#economy .rm:hover{background:rgba(63,185,80,.1)}
+#sports .rm:hover{background:rgba(88,166,255,.1)}
+#local .rm:hover{background:rgba(210,153,34,.1)}
+.chrome-hint{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--hd);border-top:2px solid var(--blu);padding:18px 20px;z-index:200;text-align:center}
+.chrome-hint.show{display:block}
+.chrome-hint h3{font-size:15px;margin-bottom:8px}
+.chrome-hint p{font-size:13px;color:var(--mt);line-height:2;margin-bottom:12px}
+.chrome-hint p strong{color:var(--tx)}
+.chrome-hint button{background:var(--bdr);border:none;color:var(--mt);padding:7px 22px;border-radius:20px;cursor:pointer;font-size:13px}
+.footer{text-align:center;font-size:11px;color:var(--mt);padding:12px 0 24px}
+@media(max-width:480px){.ct{font-size:13px}main{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="ht">
+    <div class="logo"><span class="logo-icon">&#128240;</span><h1>今日のニュース</h1></div>
+    <span class="dt" id="dt"></span>
+    <span class="upd">更新: 2026年10月19日 02:34</span>
+  </div>
+  <div class="tabs">
+<div class="tab rs" id="t-social" onclick="sw('social')">&#128478; 社会</div>
+<div class="tab" id="t-economy" onclick="sw('economy')">&#128185; 経済</div>
+<div class="tab" id="t-sports" onclick="sw('sports')">&#127942; スポーツ</div>
+<div class="tab" id="t-local" onclick="sw('local')">&#127968; 地域</div>
+  </div>
+</header>
+<main>
+<div class="panel active" id="social">
+<div class="sh"><div class="dot dr"></div><span class="sl">社会・国内外ニュース</span><span class="sc">15件</span></div>
+<div class="nl">
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">01</span><span class="ct">広く大気不安定 天気の急変に注意</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>広く大気不安定 天気の急変に注意。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599308?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">02</span><span class="ct">首相 靖国神社に私費で玉串料奉納</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>首相 靖国神社に私費で玉串料奉納。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599331?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">03</span><span class="ct">公明「打倒高市」後 描く政界再編</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>公明「打倒高市」後 描く政界再編。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599317?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">04</span><span class="ct">逮捕状の「電子令状」4都県から</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>逮捕状の「電子令状」4都県から。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599313?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">05</span><span class="ct">道府県立高145校減か 40年度まで</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>道府県立高145校減か 40年度まで。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599324?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">06</span><span class="ct">内閣支持率ほぼ横ばい57% 読売</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>内閣支持率ほぼ横ばい57% 読売。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599288?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">07</span><span class="ct">皇居初のカフェも 開業へ大詰め</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>皇居初のカフェも 開業へ大詰め。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599236?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">08</span><span class="ct">井脇ノブ子氏 ピンクスーツは47着</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国内</span></div><div class="sa"><ul class="sp"><li>井脇ノブ子氏 ピンクスーツは47着。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599241?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">09</span><span class="ct">イタリアでもデモ 一部が暴徒化</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>イタリアでもデモ 一部が暴徒化。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599328?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">10</span><span class="ct">仏大統領 暴徒に「怒りと恥辱」</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>仏大統領 暴徒に「怒りと恥辱」</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599322?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">11</span><span class="ct">フランス各地で暴動 2400人逮捕</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>フランス各地で暴動 2400人逮捕。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599304?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">12</span><span class="ct">フランス各地 デモ乗じ破壊や略奪</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>フランス各地 デモ乗じ破壊や略奪。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599281?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">13</span><span class="ct">米大統領 ネタニヤフ氏の続投支持</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>米大統領 ネタニヤフ氏の続投支持。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599320?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">14</span><span class="ct">米中間選挙 争点にデータセンター</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>米中間選挙 争点にデータセンター。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599311?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">15</span><span class="ct">NO KINGS 全米で反トランプデモ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!国際</span></div><div class="sa"><ul class="sp"><li>NO KINGS 全米で反トランプデモ。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599228?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+</div>
+</div>
+<div class="panel" id="economy">
+<div class="sh"><div class="dot dg"></div><span class="sl">経済・ビジネスニュース</span><span class="sc">15件</span></div>
+<div class="nl">
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">01</span><span class="ct">タイアップ広告炎上 厚労省が指針</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>タイアップ広告炎上 厚労省が指針。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599318?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">02</span><span class="ct">SUBARU 20年代後半にSDV投入へ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>SUBARU 20年代後半にSDV投入へ。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599267?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">03</span><span class="ct">東芝 難関大生から再評価される今</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>東芝 難関大生から再評価される今。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599312?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">04</span><span class="ct">日比谷線200m停止線越え 自動運転</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>日比谷線200m停止線越え 自動運転。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599326?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">05</span><span class="ct">ガソリンスタンドで子が給油 危険</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>ガソリンスタンドで子が給油 危険。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599263?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">06</span><span class="ct">商店がない離島の自販機 なぜ撤去</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>商店がない離島の自販機 なぜ撤去。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599249?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">07</span><span class="ct">新品畳に子が「臭い」畳店の思い</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>新品畳に子が「臭い」畳店の思い。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599303?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">08</span><span class="ct">ANA「ちいかわジェット」就航</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!経済</span></div><div class="sa"><ul class="sp"><li>ANA「ちいかわジェット」就航。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599329?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">09</span><span class="ct">「みてね」3000万人に広がるまで</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>「みてね」3000万人に広がるまで。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599319?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">10</span><span class="ct">サイバー攻撃 なぜ日本が狙われる</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>サイバー攻撃 なぜ日本が狙われる。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599306?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">11</span><span class="ct">漏えい急増は中国製LLM起因 指摘</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>漏えい急増は中国製LLM起因 指摘。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599269?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">12</span><span class="ct">AIが家電侵入 サイバー攻撃の脅威</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>AIが家電侵入 サイバー攻撃の脅威。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599237?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">13</span><span class="ct">日経の情報漏えい テレ東も影響か</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>日経の情報漏えい テレ東も影響か。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599232?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">14</span><span class="ct">広がるAI面接「察して」通用せず</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>広がるAI面接「察して」通用せず。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599238?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">15</span><span class="ct">ITシステムの弱点 世界で発見急増</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!IT</span></div><div class="sa"><ul class="sp"><li>ITシステムの弱点 世界で発見急増。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599176?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+</div>
+</div>
+<div class="panel" id="sports">
+<div class="sh"><div class="dot db"></div><span class="sl">スポーツニュース</span><span class="sc">8件</span></div>
+<div class="nl">
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">01</span><span class="ct">異例事態 ドラ1公表球団まだゼロ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>異例事態 ドラ1公表球団まだゼロ。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599323?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">02</span><span class="ct">DeNAエンカーナシオン 日本S絶望</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>DeNAエンカーナシオン 日本S絶望。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599321?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">03</span><span class="ct">阪神 島田海吏と豊田寛が戦力外</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>阪神 島田海吏と豊田寛が戦力外。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599314?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">04</span><span class="ct">中村敬斗ぼう然 9分で一発レッド</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>中村敬斗ぼう然 9分で一発レッド。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599309?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">05</span><span class="ct">久保建英ついに復活 今季初ゴール</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>久保建英ついに復活 今季初ゴール。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599298?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">06</span><span class="ct">阪神に激震 藤本総合コーチが退団</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>阪神に激震 藤本総合コーチが退団。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599302?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">07</span><span class="ct">阪神・佐藤輝明 11月中に渡米へ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>阪神・佐藤輝明 11月中に渡米へ。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599297?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">08</span><span class="ct">観客を襲撃 シン「逃げればいい」</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!スポーツ</span></div><div class="sa"><ul class="sp"><li>観客を襲撃 シン「逃げればいい」</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599226?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+</div>
+</div>
+<div class="panel" id="local">
+<div class="sh"><div class="dot dy"></div><span class="sl">地域ニュース</span><span class="sc">15件</span></div>
+<div class="nl">
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">01</span><span class="ct">バスやタクシー3台事故 13人搬送</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>バスやタクシー3台事故 13人搬送。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599330?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">02</span><span class="ct">横浜前市長 パワハラに厳しい審判</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>横浜前市長 パワハラに厳しい審判。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599310?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">03</span><span class="ct">オートバイの男性死亡 ひき逃げか</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>オートバイの男性死亡 ひき逃げか。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599316?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">04</span><span class="ct">ダンプカーが穴に転落 心肺停止</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>ダンプカーが穴に転落 心肺停止。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599332?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">05</span><span class="ct">辺野古転覆 高校生の遺族が献花</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>辺野古転覆 高校生の遺族が献花。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599293?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">06</span><span class="ct">福生市で男性刺され死亡 男を逮捕</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>福生市で男性刺され死亡 男を逮捕。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599276?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">07</span><span class="ct">傾いていた住宅が倒壊 86歳死亡</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>傾いていた住宅が倒壊 86歳死亡。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599266?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">08</span><span class="ct">クマがドア開け車内荒らしたか</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; Yahoo!地域</span></div><div class="sa"><ul class="sp"><li>クマがドア開け車内荒らしたか。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.yahoo.co.jp/pickup/6599271?source=rss"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">09</span><span class="ct">自民 西村選対委員長 靖国神社に参拝 秋の例大祭にあわせ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>自民党の西村選挙対策委員長は19日午前、秋の例大祭が行われている靖国神社に参拝しました。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261019de61352"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">10</span><span class="ct">高市首相 秋の例大祭の靖国神社参拝見送りへ 私費で玉串料奉納</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>高市総理大臣は、秋の例大祭にあわせた、靖国神社への参拝を見送ることにしていて、自民党の梶山総務会長を通じて私費で玉串料を納めました。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261019de61346"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">11</span><span class="ct">超党派議員約70人 靖国神社に参拝 井林国交相も</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>超党派議員約70人 靖国神社に参拝 井林国交相も。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261019de61344"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">12</span><span class="ct">自民 梶山氏 靖国神社に参拝 高市首相の総裁としての玉串料も</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>自民 梶山氏 靖国神社に参拝 高市首相の総裁としての玉串料も。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261019de61342"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">13</span><span class="ct">高市首相動静 2026年10月16日～18日</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>高市首相動静 2026年10月16日～18日。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261019de61338"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">14</span><span class="ct">消費税減税関連法案 あす審議入り 与野党の議論本格化へ</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>消費税減税関連法案 あす審議入り 与野党の議論本格化へ。</li><li>詳細は元記事をご確認ください。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261018de61305"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+<div class="card" onclick="tog(this)"><div class="ch"><span class="cn">15</span><span class="ct">自民 萩生田幹事長代行 高市首相が総裁選立候補なら支援</span><span class="ci">&#9662;</span></div><div class="cm"><span class="cs">&#128204; NHK地域</span></div><div class="sa"><ul class="sp"><li>自民党の萩生田幹事長代行は、来年秋に想定される党の総裁選挙について「総理大臣が長く安定して続く方がいい」と述べ、高市総理大臣が再び立候補する場合には支援する考えを示しました。</li></ul><a href="https://news.web.nhk/newsweb/na/nd-20261018de61281"  class="rm">&#128214; 全文を読む &#8599;</a></div></div>
+</div>
+</div>
+  <div class="footer">ニュースソース: Yahoo!ニュース / ITmedia / NHK地域 &nbsp;|&nbsp; 最終更新: 2026年10月19日 02:34</div>
+</main>
+
+<!-- iPhoneのChromeインストールヒント -->
+<div class="chrome-hint" id="chint">
+  <h3>&#128242; iPhoneにインストールする方法</h3>
+  <p>Chromeアプリで開いて<br>  &#8594; 右下の <strong>「&#8942;」（3点メニュー）</strong> をタップ<br>  &#8594; <strong>「ホーム画面に追加」</strong> を選択<br>  &#8594; <strong>「追加」</strong> をタップ &#8594; 完了！</p>
+  <button onclick="closeHint()">閉じる</button>
+</div>
+
+<script>
+document.getElementById("dt").textContent=
+  new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"});
+
+function sw(tab){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("rs","rg","rb","ry"));
+  document.getElementById(tab).classList.add("active");
+  const cls={social:"rs",economy:"rg",sports:"rb",local:"ry"};
+  document.getElementById("t-"+tab).classList.add(cls[tab]);
+}
+
+function tog(card){
+  const o=card.classList.contains("open");
+  document.querySelectorAll(".card.open").forEach(c=>c.classList.remove("open"));
+  if(!o) card.classList.add("open");
+}
+
+// iPhoneのChromeヒント（2秒後表示）
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+const isChrome=/CriOS/.test(navigator.userAgent);
+const isStandalone=window.navigator.standalone;
+if(isIOS&&!isStandalone&&!sessionStorage.getItem("ch")){
+  setTimeout(()=>document.getElementById("chint").classList.add("show"),2000);
+}
+function closeHint(){
+  document.getElementById("chint").classList.remove("show");
+  sessionStorage.setItem("ch","1");
+}
+
+// PWA manifest
+const md={name:"今日のニュース",short_name:"今日のニュース",
+  start_url:"./",display:"standalone",
+  background_color:"#0d1117",theme_color:"#0d1117",lang:"ja",
+  icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230d1117'/%3E%3Crect x='18' y='18' width='156' height='20' rx='10' fill='%23ff6b6b'/%3E%3Crect x='18' y='58' width='156' height='13' rx='6' fill='%23e6edf3' opacity='.9'/%3E%3Crect x='18' y='83' width='110' height='13' rx='6' fill='%23e6edf3' opacity='.6'/%3E%3Crect x='18' y='108' width='140' height='13' rx='6' fill='%23e6edf3' opacity='.8'/%3E%3Ccircle cx='38' cy='168' r='14' fill='%233fb950'/%3E%3C/svg%3E",
+    sizes:"192x192",type:"image/svg+xml"}]};
+const mb=new Blob([JSON.stringify(md)],{type:"application/json"});
+const ml=document.createElement("link");
+ml.rel="manifest";ml.href=URL.createObjectURL(mb);
+document.head.appendChild(ml);
+
+// Service Worker
+if("serviceWorker" in navigator){
+  const swSrc=`const C='nv3';
+self.addEventListener('install',()=>self.skipWaiting());
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch',e=>{
+  e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{
+    if(r&&r.status===200&&r.type==='basic'){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}
+    return r;
+  }).catch(()=>caches.match('./'))));
+});
+`;
+  const sb=new Blob([swSrc],{type:"application/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(sb),{scope:"./"})
+    .catch(e=>console.warn("SW:",e));
+}
+</script>
+</body>
+</html>
