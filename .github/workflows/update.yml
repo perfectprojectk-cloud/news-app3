@@ -1,0 +1,28 @@
+name: news-update
+
+on:
+  schedule:
+    - cron: '0 21 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch news and generate HTML
+        run: python fetch_news.py
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions"
+          git add index.html
+          git diff --staged --quiet || git commit -m "news update: $(TZ='Asia/Tokyo' date '+%Y-%m-%d %H:%M JST')"
+          git push
